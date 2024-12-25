@@ -25,27 +25,23 @@ word_lists = {
     },
 }
 
-# Initialize state to track used words, contestants, and rounds
+# Initialize session state
 if "used_words" not in st.session_state:
-    st.session_state["used_words"] = {lang: {grade: [] for grade in word_lists[lang].keys()} for lang in word_lists}
-if "contestants" not in st.session_state:
-    st.session_state["contestants"] = {lang: {grade: [] for grade in word_lists[lang].keys()} for lang in word_lists}
+    st.session_state["used_words"] = {lang: {grade: [] for grade in word_lists[lang]} for lang in word_lists}
 if "round" not in st.session_state:
-    st.session_state["round"] = {lang: {grade: 1 for grade in word_lists[lang].keys()} for lang in word_lists}
+    st.session_state["round"] = {lang: {grade: 1 for grade in word_lists[lang]} for lang in word_lists}
 if "round_history" not in st.session_state:
-    st.session_state["round_history"] = {lang: {grade: {} for grade in word_lists[lang].keys()} for lang in word_lists}
+    st.session_state["round_history"] = {lang: {grade: {} for grade in word_lists[lang]} for lang in word_lists}
 
-# Sidebar for language selection
+# Sidebar for language and grade selection
 selected_language = st.sidebar.radio("Select Language:", options=list(word_lists.keys()))
-
-# Sidebar for grade selection
 selected_grade = st.sidebar.selectbox("Select Grade:", options=list(word_lists[selected_language].keys()))
 
-# App title and description
+# App title
 st.title(f"{selected_language} Spelling Bee")
 st.write("Manage your spelling bee competition with ease!")
 
-# Input number of contestants
+# Input for number of contestants
 num_contestants = st.number_input("Enter number of contestants:", min_value=1, step=1)
 
 # Assign words for the current round
@@ -58,7 +54,6 @@ if st.button("Assign Words"):
     if len(available_words) >= num_contestants:
         assigned_words = random.sample(available_words, num_contestants)
         st.session_state["used_words"][selected_language][selected_grade].extend(assigned_words)
-        st.session_state["contestants"][selected_language][selected_grade] = assigned_words
 
         current_round = st.session_state["round"][selected_language][selected_grade]
         st.session_state["round_history"][selected_language][selected_grade][current_round] = assigned_words
@@ -67,7 +62,7 @@ if st.button("Assign Words"):
         for i, word in enumerate(assigned_words, start=1):
             st.write(f"Contestant {i}: {word}")
     else:
-        st.warning("Not enough words available.")
+        st.warning("Not enough words available. Reduce the number of contestants.")
 
 # Display round history
 st.subheader("Round History")
